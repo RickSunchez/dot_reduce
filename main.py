@@ -1,10 +1,18 @@
 from tkinter import *
+from reduce import *
 
 WIDTH = 500
 HEIGHT = 500
-DR = 2 # Dot radius
+
+MX = 0
+MY = 0
+
+DEBUG = False
+
+AMP = 10
 
 dots = []
+r = Reduce(dots, 10)
 
 def click(event):
     global c, dots
@@ -21,36 +29,87 @@ def draw():
 
     c.delete("all")
 
+    c.create_text(
+        10,20,
+        text="%d, %d" % (MX, MY),
+        fill="grey",
+        anchor=SW
+    )
+
+    f = dots[0]
+    dot(f[0], f[1])
+
     for i in range(len(dots) - 1):
         d1 = dots[i]
         d2 = dots[i+1]
 
-        c.create_oval(
-            d1[0]-DR, d1[1]-DR, 
-            d1[0]+DR, d1[1]+DR, 
-            fill="black"
-        )
-
-        c.create_oval(
-            d2[0]-DR, d2[1]-DR, 
-            d2[0]+DR, d2[1]+DR, 
-            fill="black"
-        )
+        dot(d2[0], d2[1])
 
         c.create_line(d1[0], d1[1], d2[0], d2[1])
 
-    l = dots[len(dots) - 1]
-    c.create_oval(
-        l[0]-DR, l[1]-DR, 
-        l[0]+DR, l[1]+DR, 
-        fill="black"
-    )
+    if DEBUG:
+        draw_debug()
 
 def printDots(ev):
     global c, dots
-    for d in dots:
-        print(d)
 
+    r.reduce()
+
+    draw()
+
+
+def dot(x, y):
+    global c
+    DR = 2 # Dot radius
+    
+    c.create_oval(
+        x-DR, y-DR, 
+        x+DR, y+DR, 
+        fill="black"
+    )
+
+def dotD(x, y):
+    global c
+
+    c.create_oval(
+        x-AMP, y-AMP, 
+        x+AMP, y+AMP, 
+        outline="red"
+    )
+
+def move(ev):
+    global MX, MY
+
+    MX = ev.x
+    MY = ev.y
+    
+    draw()
+
+def draw_debug():
+    global c, r
+
+    f = dots[0]
+    dotD(f[0], f[1])
+    
+    for i in range(len(dots) - 1):
+        d1 = dots[i]
+        d2 = dots[i+1]
+
+        dotD(d2[0], d2[1])
+
+    areas = r.getDebugDots()
+
+    for area in areas:
+        c.create_line(area[0][0], area[0][1], area[1][0], area[1][1])
+        c.create_line(area[1][0], area[1][1], area[2][0], area[2][1])
+        c.create_line(area[2][0], area[2][1], area[3][0], area[3][1])
+        c.create_line(area[3][0], area[3][1], area[0][0], area[0][1])
+
+def debug(ev):
+    global DEBUG
+    DEBUG = not DEBUG
+
+    draw()
 
 root = Tk()
 
@@ -61,8 +120,8 @@ c = Canvas(root, width=WIDTH, height=HEIGHT, bg="white")
 c.pack()
 
 c.bind("<Button-1>", click)
-c.bind("<p>", printDots)
-
-c.focus_set()
+root.bind("<Motion>", move)
+root.bind("<p>", printDots)
+root.bind("<d>", debug)
 
 root.mainloop()
