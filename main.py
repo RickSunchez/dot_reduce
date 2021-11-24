@@ -12,7 +12,7 @@ DEBUG = False
 AMP = 10
 
 dots = []
-r = Reduce(dots, 10)
+r = Reduce(dots, AMP)
 
 def click(event):
     global c, dots
@@ -36,6 +36,8 @@ def draw():
         anchor=SW
     )
 
+    if len(dots) == 0: return
+
     f = dots[0]
     dot(f[0], f[1])
 
@@ -50,13 +52,19 @@ def draw():
     if DEBUG:
         draw_debug()
 
-def printDots(ev):
+def letsReduceIt(ev):
     global c, dots
 
     r.reduce()
 
     draw()
 
+def clearArray(ev):
+    global dots, r
+
+    dots = []
+    r = Reduce(dots, AMP)
+    draw()
 
 def dot(x, y):
     global c
@@ -121,7 +129,8 @@ c.pack()
 
 c.bind("<Button-1>", click)
 root.bind("<Motion>", move)
-root.bind("<p>", printDots)
+root.bind("<r>", letsReduceIt)
 root.bind("<d>", debug)
+root.bind("<c>", clearArray)
 
 root.mainloop()

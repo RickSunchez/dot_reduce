@@ -78,8 +78,8 @@ class Reduce:
                 y1 = kPer1 * d2[0] + bPer1
                 y2 = kPer2 * d2[0] + bPer2
 
-                Per1 = d2[1] < y1
-                Per2 = d2[1] > y2
+                Per1 = d2[1] < max(y1, y2)
+                Per2 = d2[1] > min(y1, y2)
 
                 onPerpendiculars = Per1 and Per2
             else:
@@ -87,20 +87,12 @@ class Reduce:
                 y2 = d2[1] < d1[1]+self.amp 
 
                 onPerpendiculars = y1 and y2
-                pass
 
             if onParallels and onPerpendiculars:
                 self.da.pop(i+1)
             else:
                 i += 1
 
-        
-
-    # return k, b, flag
-    # flag:
-    # -1 -> line is parallel by OX (y1 == y2)
-    #  0 -> normal line
-    #  1 -> line is parallel by OY (x1 == x2)
     def getLineParams(self, d1=[], d2=[]):
         dx = d2[0] - d1[0]
         dy = d2[1] - d1[1]
